@@ -1,12 +1,10 @@
 const express = require('express');
-//const bodyParser = require("body-parser");
+const cors = require('cors');
 const app = express();
 
 
-/*app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));*/
 app.use(express.json());
-
+app.use(cors());
 
 const {insert,buscarPorId,deleteExame,update,readAlunos,readProfessores,readAlunoId,readProfessorId,readPaciente} = require("../models/DAO/ExameDao");
 
@@ -36,7 +34,13 @@ const {
   deleteAluno
 } = require("../models/DAO/UsuariosDAO");
 
-
+function Ttoken(token){
+  if(token === "eGv&>V£s}zV_q]#TSx[B520WGP|!~VOpe@~Y8ex)GTok,~867E"){
+    return true;
+  }else{
+    return false;
+  }
+}
 
 
 
@@ -95,12 +99,28 @@ app.delete("/pacientes/:id", async (req, res) => {
 //--------------------------------------------//
 // CREATE DE EXAME
 app.post("/exame", async (req, res) => {
-  const { paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, muco, sangue, aluno, professor } = req.body;
-  const result = await insert(paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, muco, sangue, aluno, professor);
-  if (!result) {    
-    return res.status(404).json({ success: false });
+  try{
+  const { paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica,parasita, consistencia, coloracao, muco, sangue, aluno, professor } = req.body;
+  const authorizationHeader = req.headers.authorization;
+  const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+ 
+  if(Ttoken(token)){
+    console.log("Token: valido", token);
+     const result = await insert(paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica, parasita, consistencia, coloracao, muco, sangue, aluno, professor);
+    if (!result) {    
+      return res.status(404).json({ success: false });
+    }
+  return res.status(200).json({ success: true, id: result });
+
+  }else{
+     res.status(403).json({error: true, message: "Token inválido!"});
   }
-  return res.status(200).json({ success: true, registro: result });
+ 
+
+}catch(erro){
+  console.log("erro ao criar exame:", erro);
+   return res.status(500).json({ success: false, error: erro.message });
+}
 });
 
 // READ DE EXAME POR ID

@@ -1,20 +1,21 @@
 //CONEXÃO COM O BANCO DE DADOS VEM AQUI 
 const pool = require('./db');
 
-async function insert(paciente,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,muco,sangue,aluno,professor){
+async function insert(paciente,entrada,data_exame,data_entrega,tipo_amostra,tecnica,parasita,consistencia,coloracao,muco,sangue,aluno,professor){
  try{
- 
+ console.log("cheguei no dao da api antes do insert")
     const [result] = await pool.query(`
         INSERT INTO exame (
         paciente_id, entrada, data_exame, data_entrega, tipo_amostra,
-        tecnica, consistencia, coloracao, muco, sangue, aluno_id, professor_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        tecnica, parasita, consistencia, coloracao, muco, sangue, aluno_id, professor_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
     `, [
       paciente, entrada, data_exame, data_entrega, tipo_amostra,
-      tecnica, consistencia, coloracao, muco, sangue, aluno, professor
+      tecnica, parasita, consistencia, coloracao, muco, sangue, aluno, professor
     ]);
-
+     console.log("passsou pelo insert");
     if (result.insertId && result.insertId > 0) {
+      console.log("deu certo na Dao e ta enviando a resposta")
         return result.insertId;
 
       } else {
@@ -31,7 +32,7 @@ async function insert(paciente,entrada,data_exame,data_entrega,tipo_amostra,tecn
 async function buscarPorId(id){
 try{   
   if(id){
-    const [rows] = await pool.query(`SELECT * FROM exame WHERE registro = ?`,[id]);
+    const [rows] = await pool.query(`SELECT * FROM exame WHERE id = ?`,[id]);
     const exameEncontrado = rows;
     console.log(exameEncontrado);
     if(exameEncontrado.length > 0){
@@ -48,7 +49,7 @@ async function deleteExame(id){
 
 try{
   if(id){
-    const result  = await pool.query(`DELETE FROM exame WHERE registro = ?`,[id]);
+    const result  = await pool.query(`DELETE FROM exame WHERE id = ?`,[id]);
 
     
     return true;
