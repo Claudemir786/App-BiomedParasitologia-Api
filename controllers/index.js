@@ -60,9 +60,24 @@ app.post("/pacientes", async (req, res) => {
 
 // READ TODOS OS PACIENTES
 app.get("/pacientes", async (req, res) => {
-  const pacientes = await readAll();
-  if (!pacientes) return res.status(404).json({ success: false });
-  return res.status(200).json(pacientes);
+  try{
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+    if(Ttoken(token)){
+      const pacientes = await readAllPacientes();
+      console.log("resultado dos pacientes: ",pacientes);
+
+      if (!pacientes) return res.status(404).json({ success: false });
+      return res.status(200).json(pacientes);
+    }else{
+      console.log("Erro, Token invalido")
+      return res.status(500).json({success: false, erro: "Token invalido"})
+    }
+   
+  }catch(erro){
+    console.log("erro ao ler os pacientes");
+    return res.status(401).json({success : false, erro : erro.message});
+  }
 });
 
 // READ PACIENTE POR ID
@@ -113,7 +128,7 @@ app.post("/exame", async (req, res) => {
   return res.status(200).json({ success: true, id: result });
 
   }else{
-     res.status(403).json({error: true, message: "Token inválido!"});
+     res.status(401).json({error: true, message: "Token inválido!"});
   }
  
 
@@ -158,30 +173,52 @@ app.put("/exame", async (req, res) => {
 
 // READ DE ALUNOS
 app.get("/alunos", async (req, res) => {
-  const alunos = await readAlunos();
-  if (!alunos){
+  try{
+  const authorizationHeader = req.headers.authorization;
+  const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+  
+  if(Ttoken(token)){
+    console.log("Token encontrado: ", token)
+    const alunos = await readAlunos();
+    console.log("alunos: ", alunos);
+    if (!alunos){
      return res.status(404).json({ success: false });
   }
-  return res.status(200).json(alunos);
+    return res.status(200).json(alunos);
+  }else{
+     res.status(403).json({error: true, message: "Token inválido!"});
+  }
+}catch(erro){
+  console.log("Erro ao fazer requisição");
+  return res.status(401).json({ success: false, error: erro.message });
+}
+  
 });
 
 // READ DE PROFESSORES
 app.get("/professores", async (req, res) => {
-  const professores = await readProfessores();
-  if (!professores) {
-    return res.status(404).json({ success: false });
+  try{
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+    
+    if(Ttoken(token)){
+    console.log("Token encontrado: ", token)
+    const professores = await readProfessores();
+    if (!professores) {
+      return res.status(404).json({ success: false });
+    }
+    console.log("Lista de professores: ", professores)
+    return res.status(200).json(professores);
+
+  }else{
+    res.status(403).json({error: true, message: "Token inválido!"});
   }
-  return res.status(200).json(professores);
+  }catch(erro){
+    console.log("Erro ao fazer requisição")
+    return res.status(401).json({ success: false, error: erro.message });
+  }
 });
 
-// READ DE PACIENTES
-app.get("/paciente", async (req, res) => {
-  const pacientes = await readPaciente();
-  if (!pacientes) {
-    return res.status(404).json({ success: false });
-  }
-  return res.status(200).json(pacientes);
-});
 
 // BUSCA ALUNO POR ID
 app.get("/aluno/:id", async (req, res) => {

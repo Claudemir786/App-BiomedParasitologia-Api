@@ -26,10 +26,13 @@ async function insert( nome, telefone, pacienteMail, nomeMae, medicamento, nome_
 // READ ALL
 async function readAll() {
   try {
+    console.log("chegou no pacientes Dao API")
     const [rows] = await pool.query("SELECT * FROM pacientes");
+     console.log("chegou passou pela leitura");
     if (rows.length > 0) {
       return rows;
     }
+
     return false;
   } catch (erro) {
     console.error("Erro ao ler pacientes: ", erro.message);
