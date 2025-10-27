@@ -82,8 +82,10 @@ app.get("/pacientes", async (req, res) => {
 
 // READ PACIENTE POR ID
 app.get("/pacientes/:id", async (req, res) => {
+  console.log("Cheguei na api");
   const id = parseInt(req.params.id);
   const paciente = await buscarPacientePorId(id);
+  console.log("daodos do paciente API: ", paciente )
   if (!paciente) return res.status(404).json({ success: false });
   return res.status(200).json(paciente);
 });
@@ -134,20 +136,34 @@ app.post("/exame", async (req, res) => {
 
 }catch(erro){
   console.log("erro ao criar exame:", erro);
-   return res.status(500).json({ success: false, error: erro.message });
+   return res.status(400).json({ success: false, error: erro.message });
 }
 });
 
 // READ DE EXAME POR ID
 app.get("/exame/:id", async (req, res) => {
-  const id = parseInt(req.params.id);
-  const exame = await buscarPorId(id);
-  if (!exame) {
-    return res.status(404).json({ success: false });
+  try{
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+    
+    if(Ttoken(token)){
+      console.log("Token: valido", token);
+      const id = parseInt(req.params.id);
+      const exame = await buscarPorId(id);
+      if (!exame) {
+        return res.status(404).json({ success: false });
+      }
+      return res.status(200).json(exame);
+    }else{
+     res.status(401).json({error: true, message: "Token inválido!"});
   }
-  return res.status(200).json(exame);
+
+  }catch(erro){
+    console.log("Erro ao buscar exame por ID: ", erro);
+    return res.status(400).json({success: false, erro: erro.message});
+  }
+  
 });
-//READ PACIENTE//
 
 // DELETE DE EXAME
 app.delete("/exame/:id", async (req, res) => {
