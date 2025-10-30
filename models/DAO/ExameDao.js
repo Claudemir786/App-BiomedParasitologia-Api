@@ -61,13 +61,13 @@ try{
 
 }
 
-async function update(id,paciente_id,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,muco,sangue,aluno_id,professor_id){
+async function update(id,paciente_id,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,parasita,muco,sangue,aluno_id,professor_id){
  
   //console.log(id,paciente_id,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,muco,sangue,aluno_id,professor_id)  
 try{
 const [result] = await pool.query(`UPDATE exame SET paciente_id = ?,entrada = ?,data_exame = ?,data_entrega = ?,tipo_amostra = ?,
-                                  tecnica = ?,consistencia = ?,coloracao = ?,muco = ?,sangue = ?,aluno_id = ?,professor_id = ? WHERE registro = ? `,
-                                [paciente_id,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,muco,sangue,aluno_id,professor_id, id]);
+                                  tecnica = ?,consistencia = ?,coloracao = ?,parasita = ?,muco = ?,sangue = ?,aluno_id = ?,professor_id = ? WHERE registro = ? `,
+                                [paciente_id,entrada,data_exame,data_entrega,tipo_amostra,tecnica,consistencia,coloracao,parasita,muco,sangue,aluno_id,professor_id, id]);
 
 return true;
 

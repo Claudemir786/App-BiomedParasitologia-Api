@@ -167,6 +167,7 @@ app.get("/exame/:id", async (req, res) => {
 
 // DELETE DE EXAME
 app.delete("/exame/:id", async (req, res) => {
+  
   const idExame = parseInt(req.params.id);
   const deletar = await deleteExame(idExame);
   if (!deletar){ 
@@ -177,8 +178,8 @@ app.delete("/exame/:id", async (req, res) => {
 
 // UPDATE DE EXAME
 app.put("/exame", async (req, res) => {
-  const { id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, muco, sangue, aluno_id, professor_id } = req.body;
-  const editar = await update(id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, muco, sangue, aluno_id, professor_id);
+  const { id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao,parasita,muco, sangue, aluno_id, professor_id } = req.body;
+  const editar = await update(id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, parasita,muco, sangue, aluno_id, professor_id);
   if (!editar){
      return res.status(404).json({ success: false });
   }
