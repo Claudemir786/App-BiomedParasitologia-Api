@@ -178,11 +178,12 @@ app.delete("/exame/:id", async (req, res) => {
 
 // UPDATE DE EXAME
 app.put("/exame", async (req, res) => {
-  const { id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao,parasita,muco, sangue, aluno_id, professor_id } = req.body;
-  const editar = await update(id, paciente_id, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, parasita,muco, sangue, aluno_id, professor_id);
+  const { id, paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao,parasita,muco, sangue, aluno, professor } = req.body;
+  const editar = await update(id, paciente, entrada, data_exame, data_entrega, tipo_amostra, tecnica, consistencia, coloracao, parasita,muco, sangue, aluno, professor);
   if (!editar){
      return res.status(404).json({ success: false });
   }
+  console.log("id: ", editar);
   return res.status(200).json(editar);
 });
 
