@@ -1,7 +1,7 @@
 const pool = require('./db');
 
-// CREATE
-async function insert( nome, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento) {
+// CREATE - AJUSTADO para o frontend
+async function insert(nome, telefone, email, nomeMae, medicamento, nome_medicamento) {
   try {
     const [result] = await pool.query(`
       INSERT INTO pacientes (
@@ -9,11 +9,12 @@ async function insert( nome, telefone, pacienteMail, nomeMae, medicamento, nome_
         medicamento, nome_medicamento
       ) VALUES (?, ?, ?, ?, ?, ?)
     `, [
-      nome, telefone, pacienteMail, nomeMae,
+      nome, telefone, email, nomeMae,  // ← pacienteMail → email
       medicamento, nome_medicamento
     ]);
+    
     if (result.insertId && result.insertId > 0) {
-      return result.insertId;
+      return { id: result.insertId }; // ← RETORNO COMPATÍVEL
     } else {
       return false;
     }
@@ -26,13 +27,10 @@ async function insert( nome, telefone, pacienteMail, nomeMae, medicamento, nome_
 // READ ALL
 async function readAll() {
   try {
-    console.log("chegou no pacientes Dao API")
     const [rows] = await pool.query("SELECT * FROM pacientes");
-     console.log("chegou passou pela leitura");
     if (rows.length > 0) {
       return rows;
     }
-
     return false;
   } catch (erro) {
     console.error("Erro ao ler pacientes: ", erro.message);
@@ -58,7 +56,7 @@ async function buscarPorId(id) {
 }
 
 // UPDATE
-async function update(id, nome, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento) {
+async function update(id, nome, telefone, email, nomeMae, medicamento, nome_medicamento) {
   try {
     const [result] = await pool.query(`
       UPDATE pacientes SET
@@ -66,7 +64,7 @@ async function update(id, nome, telefone, pacienteMail, nomeMae, medicamento, no
         medicamento = ?, nome_medicamento = ?
       WHERE id = ?
     `, [
-      nome, telefone, pacienteMail, nomeMae,
+      nome, telefone, email, nomeMae,  // ← pacienteMail → email
       medicamento, nome_medicamento, id
     ]);
     return result.affectedRows > 0;
@@ -90,10 +88,25 @@ async function deletePaciente(id) {
   }
 }
 
+// SEARCH BY NAME - ADICIONE ESTA FUNÇÃO
+async function buscarPorNome(nome) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT * FROM pacientes WHERE nome LIKE ? ORDER BY nome`, 
+      [`%${nome}%`]
+    );
+    return rows;
+  } catch (erro) {
+    console.error("Erro ao buscar paciente por nome: ", erro.message);
+    return [];
+  }
+}
+
 module.exports = {
   insert,
   readAll,
   buscarPorId,
   update,
-  deletePaciente
+  deletePaciente,
+  buscarPorNome  // ← EXPORTE A NOVA FUNÇÃO
 };
