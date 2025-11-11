@@ -1,20 +1,20 @@
 const pool = require('./db');
 
-// CREATE - AJUSTADO para o frontend
-async function insert(nome, telefone, email, nomeMae, medicamento, nome_medicamento) {
+// CREATE - COM dataNasc
+async function insert(nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento) {
   try {
     const [result] = await pool.query(`
       INSERT INTO pacientes (
-        nome, telefone, pacienteMail, nomeMae,
+        nome, dataNasc, telefone, pacienteMail, nomeMae,
         medicamento, nome_medicamento
-      ) VALUES (?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
     `, [
-      nome, telefone, email, nomeMae,  // ← pacienteMail → email
+      nome, dataNasc, telefone, pacienteMail, nomeMae,
       medicamento, nome_medicamento
     ]);
     
     if (result.insertId && result.insertId > 0) {
-      return { id: result.insertId }; // ← RETORNO COMPATÍVEL
+      return result.insertId;
     } else {
       return false;
     }
@@ -55,16 +55,16 @@ async function buscarPorId(id) {
   }
 }
 
-// UPDATE
-async function update(id, nome, telefone, email, nomeMae, medicamento, nome_medicamento) {
+// UPDATE - COM dataNasc
+async function update(id, nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento) {
   try {
     const [result] = await pool.query(`
       UPDATE pacientes SET
-        nome = ?, telefone = ?, pacienteMail = ?, nomeMae = ?,
+        nome = ?, dataNasc = ?, telefone = ?, pacienteMail = ?, nomeMae = ?,
         medicamento = ?, nome_medicamento = ?
       WHERE id = ?
     `, [
-      nome, telefone, email, nomeMae,  // ← pacienteMail → email
+      nome, dataNasc, telefone, pacienteMail, nomeMae,
       medicamento, nome_medicamento, id
     ]);
     return result.affectedRows > 0;
@@ -88,7 +88,7 @@ async function deletePaciente(id) {
   }
 }
 
-// SEARCH BY NAME - ADICIONE ESTA FUNÇÃO
+// SEARCH BY NAME
 async function buscarPorNome(nome) {
   try {
     const [rows] = await pool.query(
@@ -108,5 +108,5 @@ module.exports = {
   buscarPorId,
   update,
   deletePaciente,
-  buscarPorNome  // ← EXPORTE A NOVA FUNÇÃO
+  buscarPorNome
 };

@@ -48,16 +48,17 @@ function Ttoken(token){
 // CREATE PACIENTE
 app.post("/pacientes", async (req, res) => {
   const {
-    nome, datanasc, telefone, pacienteMail, nomeMae,
+    nome, dataNasc, telefone, pacienteMail, nomeMae,
     medicamento, nome_medicamento
   } = req.body;
+  
   const novoPaciente = await insertPaciente(
-    nome, datanasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
+    nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
   );
+  
   if (!novoPaciente) return res.status(400).json({ success: false });
   return res.status(201).json({ success: true, paciente: { id: novoPaciente, nome, pacienteMail } });
 });
-
 // READ TODOS OS PACIENTES
 app.get("/pacientes", async (req, res) => {
   try{
@@ -94,12 +95,14 @@ app.get("/pacientes/:id", async (req, res) => {
 app.put("/pacientes/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const {
-    nome, datanasc, telefone, pacienteMail, nomeMae,
+    nome, dataNasc, telefone, pacienteMail, nomeMae,
     medicamento, nome_medicamento
   } = req.body;
+  
   const atualizado = await updatePaciente(
-    id, nome, datanasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
+    id, nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
   );
+  
   if (!atualizado) return res.status(404).json({ success: false });
   return res.status(200).json({ success: true });
 });
