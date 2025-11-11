@@ -15,7 +15,7 @@ const {
   readAll: readAllPacientes,
   buscarPorId: buscarPacientePorId,
   update: updatePaciente,
-  deletePaciente
+  deletePaciente,
 } = require("../models/DAO/PacientesDao");
 
 
@@ -59,11 +59,12 @@ app.post("/pacientes", async (req, res) => {
   if (!novoPaciente) return res.status(400).json({ success: false });
   return res.status(201).json({ success: true, paciente: { id: novoPaciente, nome, pacienteMail } });
 });
+
 // READ TODOS OS PACIENTES
 app.get("/pacientes", async (req, res) => {
   try{
     const authorizationHeader = req.headers.authorization;
-    const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+    const token = authorizationHeader.split(" ")[1];
     if(Ttoken(token)){
       const pacientes = await readAllPacientes();
       console.log("resultado dos pacientes: ",pacientes);
@@ -78,6 +79,37 @@ app.get("/pacientes", async (req, res) => {
   }catch(erro){
     console.log("erro ao ler os pacientes");
     return res.status(401).json({success : false, erro : erro.message});
+  }
+});
+
+// BUSCAR PACIENTES POR NOME - CORRIGIDA
+app.get("/pacientes/search", async (req, res) => {
+  try {
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(" ")[1];
+    
+    if (Ttoken(token)) {
+      const { nome } = req.query;
+      
+      if (!nome) {
+        return res.status(400).json({ success: false, error: "Parâmetro nome é obrigatório" });
+      }
+      
+      console.log("Buscando pacientes com nome:", nome);
+      
+      // Importe diretamente dentro da função
+      const PacientesDao = require("../models/DAO/PacientesDao");
+      const pacientes = await PacientesDao.buscarPorNome(nome);
+      
+      console.log("Pacientes encontrados:", pacientes.length);
+      return res.status(200).json(pacientes);
+      
+    } else {
+      return res.status(403).json({ success: false, error: "Token inválido" });
+    }
+  } catch (erro) {
+    console.log("Erro na rota /pacientes/search:", erro);
+    return res.status(500).json({ success: false, error: erro.message });
   }
 });
 

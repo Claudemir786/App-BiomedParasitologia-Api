@@ -88,7 +88,6 @@ async function deletePaciente(id) {
   }
 }
 
-// SEARCH BY NAME
 async function buscarPorNome(nome) {
   try {
     const [rows] = await pool.query(
@@ -108,5 +107,5 @@ module.exports = {
   buscarPorId,
   update,
   deletePaciente,
-  buscarPorNome
+  buscarPorNome,
 };
