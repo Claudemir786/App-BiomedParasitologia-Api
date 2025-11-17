@@ -141,7 +141,7 @@ app.post("/exame", async (req, res) => {
 });
 
 // READ DE EXAME POR ID
-app.get("/exame/:id", async (req, res) => {
+app.get("/exame/:id", async  (req, res) => {
   try{
     const authorizationHeader = req.headers.authorization;
     const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
@@ -204,7 +204,7 @@ app.get("/alunos", async (req, res) => {
   }
     return res.status(200).json(alunos);
   }else{
-     res.status(403).json({error: true, message: "Token inválido!"});
+     return res.status(403).json({error: true, message: "Token inválido!"});
   }
 }catch(erro){
   console.log("Erro ao fazer requisição");
