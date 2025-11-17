@@ -15,7 +15,7 @@ const {
   readAll: readAllPacientes,
   buscarPorId: buscarPacientePorId,
   update: updatePaciente,
-  deletePaciente
+  deletePaciente,
 } = require("../models/DAO/PacientesDao");
 
 
@@ -48,12 +48,14 @@ function Ttoken(token){
 // CREATE PACIENTE
 app.post("/pacientes", async (req, res) => {
   const {
-    nome, datanasc, telefone, pacienteMail, nomeMae,
+    nome, dataNasc, telefone, pacienteMail, nomeMae,
     medicamento, nome_medicamento
   } = req.body;
+  
   const novoPaciente = await insertPaciente(
-    nome, datanasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
+    nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
   );
+  
   if (!novoPaciente) return res.status(400).json({ success: false });
   return res.status(201).json({ success: true, paciente: { id: novoPaciente, nome, pacienteMail } });
 });
@@ -62,7 +64,7 @@ app.post("/pacientes", async (req, res) => {
 app.get("/pacientes", async (req, res) => {
   try{
     const authorizationHeader = req.headers.authorization;
-    const token = authorizationHeader.split(" ")[1];//O token real está na segunda posição do array (índice 1), porque a primeira posição (índice 0) é "Bearer":
+    const token = authorizationHeader.split(" ")[1];
     if(Ttoken(token)){
       const pacientes = await readAllPacientes();
       console.log("resultado dos pacientes: ",pacientes);
@@ -80,6 +82,37 @@ app.get("/pacientes", async (req, res) => {
   }
 });
 
+// BUSCAR PACIENTES POR NOME - CORRIGIDA
+app.get("/pacientes/search", async (req, res) => {
+  try {
+    const authorizationHeader = req.headers.authorization;
+    const token = authorizationHeader.split(" ")[1];
+    
+    if (Ttoken(token)) {
+      const { nome } = req.query;
+      
+      if (!nome) {
+        return res.status(400).json({ success: false, error: "Parâmetro nome é obrigatório" });
+      }
+      
+      console.log("Buscando pacientes com nome:", nome);
+      
+      // Importe diretamente dentro da função
+      const PacientesDao = require("../models/DAO/PacientesDao");
+      const pacientes = await PacientesDao.buscarPorNome(nome);
+      
+      console.log("Pacientes encontrados:", pacientes.length);
+      return res.status(200).json(pacientes);
+      
+    } else {
+      return res.status(403).json({ success: false, error: "Token inválido" });
+    }
+  } catch (erro) {
+    console.log("Erro na rota /pacientes/search:", erro);
+    return res.status(500).json({ success: false, error: erro.message });
+  }
+});
+
 // READ PACIENTE POR ID
 app.get("/pacientes/:id", async (req, res) => {
   console.log("Cheguei na api");
@@ -94,12 +127,14 @@ app.get("/pacientes/:id", async (req, res) => {
 app.put("/pacientes/:id", async (req, res) => {
   const id = parseInt(req.params.id);
   const {
-    nome, datanasc, telefone, pacienteMail, nomeMae,
+    nome, dataNasc, telefone, pacienteMail, nomeMae,
     medicamento, nome_medicamento
   } = req.body;
+  
   const atualizado = await updatePaciente(
-    id, nome, datanasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
+    id, nome, dataNasc, telefone, pacienteMail, nomeMae, medicamento, nome_medicamento
   );
+  
   if (!atualizado) return res.status(404).json({ success: false });
   return res.status(200).json({ success: true });
 });
